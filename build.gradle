@@ -1,0 +1,64 @@
+import java.text.SimpleDateFormat
+
+def javaVersion = System.getProperty("java.version")
+if (!javaVersion.startsWith("11")) {
+    throw new RuntimeException("Incompatible JRE version: " + javaVersion + ". Use JRE 11 instead.")
+}
+
+group "io.github.gcdd1993"
+version root_version
+
+apply plugin: "java"
+apply plugin: "idea"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+jar {
+    enabled = true
+    manifest {
+        attributes(
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version,
+                "Built-By": System.properties["user.name"],
+                "Build-Timestamp": new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                "Created-By": "Gradle ${gradle.gradleVersion}",
+                "Build-Jdk": "${System.properties["java.version"]} (${System.properties["java.vendor"]} ${System.properties["java.vm.version"]})",
+                "Build-OS": "${System.properties["os.name"]} ${System.properties["os.arch"]} ${System.properties["os.version"]}"
+        )
+    }
+}
+
+dependencies {
+    implementation("org.jeecgframework.boot:codegenerate:$codegenerate_version")
+    implementation("org.slf4j:slf4j-simple:1.7.36")
+    implementation("commons-lang:commons-lang:2.6")
+    implementation("org.freemarker:freemarker:2.3.31")
+
+    runtimeOnly("mysql:mysql-connector-java:8.0.29")
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url "http://maven.jeecg.com:8090/nexus/content/repositories/jeecg"
+        mavenContent {
+            releasesOnly()
+        }
+    }
+    maven {
+        url "http://maven.jeecg.com:8090/nexus/content/repositories/snapshots/"
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+    maven { url = uri("https://maven.aliyun.com/repository/central") } // central
+    maven { url = uri("https://maven.aliyun.com/repository/public") } // jcenter & public
+    maven { url = uri("https://maven.aliyun.com/repository/google") } // google
+    maven { url = uri("https://maven.aliyun.com/repository/spring") } // spring
+    maven { url = uri("https://maven.aliyun.com/repository/spring-plugin") } // spring plugin
+    maven { url = uri("https://maven.aliyun.com/repository/grails-core") } // spring plugin
+}
+
